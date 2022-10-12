@@ -38,4 +38,9 @@ ngOnInit() {
 
 
 entryComponents: the set of components to compile when this NgModule is defined, so that they can be dynamically loaded into the view
+
+[] - get and set
+() - отслеживать setting
+[()]  и то и другое
+
 ```
