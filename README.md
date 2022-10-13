@@ -43,4 +43,29 @@ entryComponents: the set of components to compile when this NgModule is defined,
 () - отслеживать setting
 [()]  и то и другое
 
+
+Обновление таблицы
+@ViewChild(MatTable, {static: true}) table: MatTable<User>;
+this.table.renderRows();
+
+Подписка на событие
+dialogSubscription: Subscription;
+
+if (this.dialogSubscription) {
+  console.log('unsubscribed from event');
+  this.dialogSubscription.unsubscribe();
+}
+
+this.dialogSubscription = ll.afterClosed().subscribe(x => {
+      console.dir(x);
+      // Тут можно загрузить данные
+});
+
+При уничтожении компоненты
+
+  ngOnDestroy(): void {
+    this.dialogSubscription.unsubscribe();
+  }
+
+  
 ```
