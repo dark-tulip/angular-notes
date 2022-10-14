@@ -67,5 +67,9 @@ this.dialogSubscription = ll.afterClosed().subscribe(x => {
     this.dialogSubscription.unsubscribe();
   }
 
-  
+Пройтись по enum
+
+  public phoneTypes = Object.values(PhoneType);
+
+
 ```
