@@ -68,8 +68,59 @@ this.dialogSubscription = ll.afterClosed().subscribe(x => {
   }
 
 Пройтись по enum
+public phoneTypes = Object.values(PhoneType);
 
-  public phoneTypes = Object.values(PhoneType);
+
+$event - этот элемент нативныый
+<input type="text" (input)="inputHandler($event)">
+inputHandler(event: any) {
+  const value = event.target.value;
+  this.title = value;
+}
 
 
+<input type="text" #myInput (input)="inputHandler(myInput.value)">
+nputHandler(value) {
+  this.title = value;
+}
+
+Two way binding
+ngModel works with Forms module
+<input type='text' [(ngModel)]="title">
+
+Директивы - вспомогательные инструменты
+Забайндить - сделать динамической  
+[ngStyle]="{
+  color: title.length < 5 ? 'black' : 'blue';
+}"
+<p
+  [class.blue]="textColor === 'blue'"
+  [class.green]="textColor === 'green'"
+  [class.red]="textColor === 'red'"
+>{{ text }}</p>
+
+<button (click)="textColor='blue'">set blue</button>
+<button (click)="textColor='red'">set red</button>
+<button (click)="textColor='green'">set green</button>
+
+
+Hide component
+export class AppComponent {
+  toggle = true;
+  toggleCards() {
+    this.toggle = !this.toggle;
+  }
+}
+
+<button (click)="toggleCards()"></button>
+<div *ngIf="toggle; else noCards">
+  <app-card></app-card>
+  <app-card></app-card>
+  <app-card></app-card>
+</div>
+<ng-template #noCards>
+  <p>Cards are hidden</p>
+</ng-template>
+
+* значит что данная директива меняет html
 ```
