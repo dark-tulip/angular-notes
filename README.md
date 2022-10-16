@@ -10,7 +10,7 @@ global styles are defined on
 ```
 styles.css
 ```
-```
+```html
 app-root component, is the “home page” of the application,
 export - для того чтобы они были видны в других компонентах
 @Component -  это декоратор
