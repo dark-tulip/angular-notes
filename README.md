@@ -124,3 +124,14 @@ export class AppComponent {
 
 * значит что данная директива меняет html
 ```
+
+  applyFilter(event: KeyboardEvent) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    console.log('Event', filterValue);
+    this.dataSource = this.userService.dataSource.filter(x => x.username.includes(filterValue));
+  }
+  
+  <mat-form-field appearance="standard">
+  <mat-label>Filter</mat-label>
+  <input matInput (keyup)="applyFilter($event)" placeholder="Search columns" #input>
+</mat-form-field>
