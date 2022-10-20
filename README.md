@@ -145,3 +145,90 @@ export class AppComponent {
     return result;
   }
   
+  
+### Добавление иконок
+index.html
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+<div class="example-button-row">
+  <button mat-button color="primary" (click)="openModal()">Primary</button>
+  <button><mat-icon>keyboard_arrow_left</mat-icon></button>
+  <button><mat-icon>keyboard_arrow_right</mat-icon></button>
+</div>
+
+### Пагинация
+
+```ts
+// AppComponent
+  dataSource;
+  currentPage = 1;
+  itemsPerPage = 5;
+  filterValue = '';
+
+  constructor(private testController: TestController,
+              public userService: UserService,
+              public matDialog: MatDialog) {
+    this.dataColumns = userService.dataColumns;
+    this.dataSource = userService.getUsers();
+  }
+  
+  applyFilter() {
+    console.log('Filter by substr: ', this.filterValue);
+    this.currentPage = 1;
+    this.dataSource = this.userService.getUsers(this.currentPage, this.itemsPerPage, this.filterValue);
+  }
+
+  pageDown() {
+    this.currentPage--;
+    this.dataSource = this.userService.getUsers(this.currentPage, this.itemsPerPage, this.filterValue);
+    console.log('pageDown this.currentPage', this.currentPage);
+  }
+
+  pageUp() {
+    this.currentPage++;
+    this.dataSource = this.userService.getUsers(this.currentPage, this.itemsPerPage, this.filterValue);
+    console.log('pageUp this.currentPage', this.currentPage);
+  }
+
+  getTotalPages() {
+    const pages = Math.ceil(this.userService.getTotalSize(this.filterValue) / this.itemsPerPage);
+    console.log('pages', pages);
+    return pages;
+  }
+```  
+
+```
+// UserService
+getUsers(page?: number, itemsPerPage?: number, filterValue?: string) {
+    if (!filterValue) {
+      filterValue = '';
+    }
+    if (!page) {
+      page = 1;
+    }
+    if (!itemsPerPage) {
+      itemsPerPage = 5;
+    }
+    return this.dataSource
+      .filter(x => x.username.includes(filterValue))
+      .slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  }
+
+  getTotalSize(filterValue?: string) {
+    return this.dataSource
+      .filter(x => x.username.includes(filterValue)).length;
+  }
+```
+
+```html
+<mat-form-field appearance="standard">
+  <mat-label>Filter</mat-label>
+  <input matInput [(ngModel)]="filterValue" (ngModelChange)="applyFilter()" placeholder="Search columns">
+</mat-form-field>
+
+<div class="example-button-row">
+  <button mat-button color="primary" (click)="openModal()">Primary</button>
+  <button mat-button (click)="pageDown()" [disabled]="currentPage == 1"><mat-icon>keyboard_arrow_left</mat-icon></button>
+  <button mat-button (click)="pageUp()"   [disabled]="currentPage == getTotalPages()"><mat-icon>keyboard_arrow_right</mat-icon></button>
+</div>
+```
