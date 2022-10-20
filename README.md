@@ -135,3 +135,13 @@ export class AppComponent {
   <mat-label>Filter</mat-label>
   <input matInput (keyup)="applyFilter($event)" placeholder="Search columns" #input>
 </mat-form-field>
+
+  filterBy(filterBy: string) {
+    const result = this.dataSource.filter(x => x.username.includes(filterBy)
+      || x.surname.includes(filterBy)
+      || x.fathersName.includes(filterBy)
+    );
+    console.log('Filter by: ', result);
+    return result;
+  }
+  
