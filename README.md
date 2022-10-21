@@ -159,42 +159,155 @@ index.html
 ### Пагинация
 
 ```ts
-// AppComponent
-  dataSource;
+export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  dialogSubscription: Subscription;
+
+  dataSource: MatTableDataSource<User>;
+
   currentPage = 1;
   itemsPerPage = 5;
   filterValue = '';
+  totalItems = 0;
+  totalPages = 0;
+  sortByColumn = '';
+  sortDirection = '';
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(private testController: TestController,
               public userService: UserService,
               public matDialog: MatDialog) {
-    this.dataColumns = userService.dataColumns;
-    this.dataSource = userService.getUsers();
   }
-  
+
+  ngOnDestroy(): void {
+    this.dialogSubscription.unsubscribe();
+  }
+
+  ngOnInit(): void {
+    this.refreshDataSource();
+  }
+
+  ngAfterViewInit(): void {
+
+  }
+
+  deleteRow(user: User) {
+    this.userService.deleteUser(user);
+    if (this.dataSource.data.length <= 1) {
+      this.pageDown();
+    }
+    this.refreshDataSource();
+  }
+
+
+  /**
+   * Если передали пользователя - user edit mode
+   * Иначе - new user mode
+   * @param user
+   */
+  openUser(user?: User) {
+
+    const userDraft = Object.assign(new User(), user);
+
+    const dialogConfig = new MatDialogConfig();
+    dialogConfig.id = 'modal-component';
+    dialogConfig.height = '900px';
+    dialogConfig.width = '1200px';
+    dialogConfig.data = userDraft;
+
+    let openedModal = this.matDialog.open(ModalComponent, dialogConfig);
+
+    if (this.dialogSubscription) {
+      this.dialogSubscription.unsubscribe();
+    }
+
+    this.dialogSubscription = openedModal.beforeClosed().subscribe(editedUser => {
+
+      if (editedUser?.id) {  // update
+        this.userService.updateUser(editedUser);
+        this.refreshDataSource();
+
+      } else if (editedUser && Object.keys(editedUser).length) {  // add new user
+        this.userService.addUser(editedUser);
+        this.refreshDataSource();
+
+      } else {
+        console.log('Adding user cancelled, empty data');
+      }
+    });
+  }
+
   applyFilter() {
     console.log('Filter by substr: ', this.filterValue);
     this.currentPage = 1;
-    this.dataSource = this.userService.getUsers(this.currentPage, this.itemsPerPage, this.filterValue);
+    this.refreshDataSource();
   }
 
   pageDown() {
     this.currentPage--;
-    this.dataSource = this.userService.getUsers(this.currentPage, this.itemsPerPage, this.filterValue);
+    this.refreshDataSource();
     console.log('pageDown this.currentPage', this.currentPage);
   }
 
   pageUp() {
     this.currentPage++;
-    this.dataSource = this.userService.getUsers(this.currentPage, this.itemsPerPage, this.filterValue);
+    this.refreshDataSource();
     console.log('pageUp this.currentPage', this.currentPage);
   }
 
-  getTotalPages() {
-    const pages = Math.ceil(this.userService.getTotalSize(this.filterValue) / this.itemsPerPage);
-    console.log('pages', pages);
-    return pages;
+  refreshDataSource() {
+    console.log('refresh data src');
+    this.dataSource = new MatTableDataSource<User>(
+      this.userService.getUsers(this.currentPage,
+        this.itemsPerPage,
+        this.filterValue,
+        this.sortByColumn,
+        this.sortDirection
+      )
+    );
+    this.totalItems = this.userService.getTotalSize(this.filterValue);
+    this.totalPages = Math.ceil(this.totalItems / this.itemsPerPage);
   }
+
+  resetFilter() {
+    this.filterValue = '';
+    this.currentPage = 1;
+    this.refreshDataSource();
+  }
+
+  sortData(event: Sort) {
+    console.log('active', event.active, 'direction', event.direction);
+    this.sortByColumn = event.active;
+    this.sortDirection = event.direction;
+    this.refreshDataSource();
+    console.dir(this.dataSource.data);
+  }
+
+  helloResult: string = null;
+  complexObjectResult: ComplexObject = null;
+  hello = 'Hello';
+
+  async sendComplexObject() {
+    const complexObject: ComplexObject = {
+      id: 42,
+      title: 'test',
+      description: 'Big object',
+      date: new Date(),
+      phoneNumber: {
+        phoneType: PhoneType.MOBILE,
+        number: '77074655454',
+        isRequired: true
+      },
+    };
+    console.log(complexObject);
+    this.complexObjectResult = await this.testController.sendComplexObject(complexObject);
+  }
+
+  async say() {
+    this.helloResult = await this.testController.sayHello(this.hello);
+  }
+}
 ```  
 
 ```
@@ -221,14 +334,55 @@ getUsers(page?: number, itemsPerPage?: number, filterValue?: string) {
 ```
 
 ```html
-<mat-form-field appearance="standard">
-  <mat-label>Filter</mat-label>
-  <input matInput [(ngModel)]="filterValue" (ngModelChange)="applyFilter()" placeholder="Search columns">
-</mat-form-field>
+<section>
+    <div class="example-button-row">
+      <button mat-button color="primary" class="add-btn" (click)="openUser()">Добавить</button>
 
-<div class="example-button-row">
-  <button mat-button color="primary" (click)="openModal()">Primary</button>
-  <button mat-button (click)="pageDown()" [disabled]="currentPage == 1"><mat-icon>keyboard_arrow_left</mat-icon></button>
-  <button mat-button (click)="pageUp()"   [disabled]="currentPage == getTotalPages()"><mat-icon>keyboard_arrow_right</mat-icon></button>
-</div>
+      <button mat-button (click)="pageDown()" [disabled]="currentPage <= 1">
+        <mat-icon>keyboard_arrow_left</mat-icon>
+      </button>
+      <button mat-button (click)="pageUp()" [disabled]="currentPage >= this.totalPages">
+        <mat-icon>keyboard_arrow_right</mat-icon>
+      </button>
+
+      <mat-form-field appearance="standard">
+        <mat-label>Поиск</mat-label>
+        <input matInput [(ngModel)]="filterValue" (ngModelChange)="applyFilter()" placeholder="Поиск">
+        <button *ngIf="filterValue" matSuffix mat-icon-button aria-label="Clear" (click)="resetFilter()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+    </div>
+  </section>
+```
+#### Comparator
+```
+type CompareFn = <T>(a: User, b: User, sortDirection: string, sortByColumn: string) => number;
+
+/**
+ * Сортировка пользователя по полям
+ * @param a - user1
+ * @param b - user2
+ * @param sortDirection
+ * @param sortByColumn
+ */
+const sortUsers: CompareFn = (a: User, b: User, sortDirection: string, sortByColumn: string) => {
+  const isAsc = sortDirection === 'asc';
+  switch (sortByColumn) {
+    case 'surname':
+      return compare(a.surname, b.surname, isAsc);
+    case 'character':
+      return compare(a.character, b.character, isAsc);
+    case 'totalAccountBalance':
+      return compare(a.totalAccountBalance, b.totalAccountBalance, isAsc);
+    case 'minBalance':
+      return compare(a.minBalance, b.minBalance, isAsc);
+    case 'maxBalance':
+      return compare(a.maxBalance, b.maxBalance, isAsc);
+    case 'age':
+      return compare(a.age, b.age, isAsc);
+    default:
+      return 0;
+  }
+};
 ```
