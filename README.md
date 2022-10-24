@@ -1,5 +1,28 @@
 #### Отключить линтер
 Preferences - tslint - disable
+#### Aliases
+```ts
+type Login: string  // кастомный тип
+const login: Login = 'admin'
+
+type ID = string | number  // или строка или число
+const id1 = 1234
+const id2 = '12345'
+```
+#### Interfaces
+```
+interface Rect {
+  readonly id: string   // модификатор доступа, только для чтения
+  color?: string   // необязательный
+}
+// Константы нельзя reassign-ить
+const rect: Rect = {
+  id: '1234'
+}
+// указание типа
+const rect2: <Rect>{}
+const rect3: {} as Rect;
+```
 
 #### Создание компоненты
 ```typescript
@@ -68,6 +91,15 @@ this.dialogSubscription = ll.afterClosed().subscribe(x => {
 #### Пройтись по enum
 ```typescript
 public phoneTypes = Object.values(PhoneType);
+
+enum Membership {
+  Simple,
+  Standart,
+  Premium
+}
+
+console.log(Membership.Simple)  // 0
+console.log(Membership[2])      // Premium - this is reversed enum
 ```
 
 $event - этот элемент нативныый
