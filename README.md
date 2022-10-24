@@ -101,7 +101,86 @@ enum Membership {
 console.log(Membership.Simple)  // 0
 console.log(Membership[2])      // Premium - this is reversed enum
 ```
+#### Классы
+```ts
+protected - только в классе animal и все что наследуется
+readonly - можно определять только в конструкторе
+constructor(readonly model: string) { }  // та же запись что и с определением поля
+```
+#### Guards
+```ts
+function strip(x: string | number) {
+  if (typeof x === 'number') {
+    return x.toFixed(2);
+  }
+  return x.trim();
+}
 
+class MyResponse {
+  header = 'response header'
+  result = 'response result'
+}
+
+class MyError {
+  header = 'error'
+  message = 'error msg'
+}
+
+function handle(res: MyResponse | MyHeader) {
+  if (res instanceof MyResponse) {
+    return {
+      info: res.header + res.result;
+    }
+  } else {
+    return {
+      info: res.header + res.message;
+    }
+  }
+}
+
+type AlertType = 'success' | 'danger' | warning
+function setAllertType(type: AlertType) { }
+
+setAllertType('success')  // OK
+setAllertType('default')  // ERROR
+```
+#### Generic types
+```ts
+const arrayOfNums: Array<number> = [1,1,1,1,3]
+const arrayOfstr: Array<number> = ['hello', 'world']
+
+// функция работающая с разными типами данных
+// Данный параметр динамически будет подстраиваться под те типы что мы передаем
+function reverse<T>(array: T[]): T[] {
+  retun array.reverse();
+}
+
+reverse(arrayOfNums);
+reverse(arrayOfstr);
+```
+#### Перечисление ключей keyof
+```ts
+interface Person {
+  name: stirng
+  age: number
+}
+type PersonKeys = keyof Person // 'name' | 'age'
+let key: PersonKeys = 'name'
+key = 'age'
+key = 'test'  // ERROR
+
+type User = {
+  _id: number
+  name: string
+  email: string
+  createdAt: Date
+}
+
+type UserKeysExclude = Exclude<keyof User, '_id' | 'createdAt'>  // only 'name' | 'email'
+type UserKeysInclude = Pick<User, 'name' | 'email'>              // only 'name' | 'email'
+```
+
+```ts
 $event - этот элемент нативныый
 <input type="text" (input)="inputHandler($event)">
 inputHandler(event: any) {
@@ -114,7 +193,7 @@ inputHandler(event: any) {
 nputHandler(value) {
   this.title = value;
 }
-
+```
 #### Two way binding
 ngModel works with Forms module
 ```
