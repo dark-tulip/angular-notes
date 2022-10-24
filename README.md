@@ -32,7 +32,7 @@ bindings - связка шаблона и компонента
 ngOnInit() {
   // вызывается когда стартует компонент
 }
-
+```
 #### entryComponents: the set of components to compile when this NgModule is defined, so that they can be dynamically loaded into the view
 ```typescript
 [] - get and set
@@ -124,7 +124,7 @@ export class AppComponent {
   <p>Cards are hidden</p>
 </ng-template>
 ```
-* значит что данная директива меняет html
+`*` значит что данная директива меняет html
 ```typescript
   applyFilter(event: KeyboardEvent) {
     const filterValue = (event.target as HTMLInputElement).value;
@@ -312,8 +312,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
 }
 ```  
 
-```
-// UserService
+```typescript [title="UserService.ts"]
 getUsers(page?: number, itemsPerPage?: number, filterValue?: string) {
     if (!filterValue) {
       filterValue = '';
