@@ -1,5 +1,8 @@
 #### Отключить линтер
 Preferences - tslint - disable
+
+## TypeScript
+
 #### Aliases
 ```ts
 type Login: string  // кастомный тип
@@ -23,71 +26,6 @@ const rect: Rect = {
 const rect2: <Rect>{}
 const rect3: {} as Rect;
 ```
-
-#### Создание компоненты
-```typescript
-ng generate component modal
-ng g c modal --skipTests
-```
-
-```html
-app-root component, is the “home page” of the application,
-export - для того чтобы они были видны в других компонентах
-@Component -  это декоратор
-selector - куда вставлять компонент
-templateUrl - какой html шаблон
-```
-```
-{{}} - интерполяция вставка переменной из ts компоненты (подстановка ts|js)
-interpaltion: ['{{', '}}']
-{{ user | json }} - this is a pipe, same as JSON.stringify(user)
-<pre> </pre> - сохраняет различные пробелы (особенно json)
-```
-```
-bindings - связка шаблона и компонента
-когда мы передаем значение в атрибут, нужно воспользоваться концепцией binding
-[src]="imageUrl" байндим атрибут в квадратные скобки, понимает что это значение динамической переменной
-мы можем байндить любые атрибуты и передавать им динамику
-```
-```
-инициализация элементов в lifecycle cookie 
-добавление интерфейсов OnInit
-ngOnInit() {
-  // вызывается когда стартует компонент
-}
-```
-#### entryComponents: the set of components to compile when this NgModule is defined, so that they can be dynamically loaded into the view
-```typescript
-[] - get and set
-() - отслеживать setting
-[()]  и то и другое
-```
-
-#### Обновление таблицы
-```typescript
-@ViewChild(MatTable, {static: true}) table: MatTable<User>;
-this.table.renderRows();
-```
-#### Подписка на событие
-```typescript
-dialogSubscription: Subscription;
-
-if (this.dialogSubscription) {
-  console.log('unsubscribed from event');
-  this.dialogSubscription.unsubscribe();
-}
-
-this.dialogSubscription = ll.afterClosed().subscribe(x => {
-      console.dir(x);
-      // Тут можно загрузить данные
-});
-```
-#### При уничтожении компоненты
-```typescript
-  ngOnDestroy(): void {
-    this.dialogSubscription.unsubscribe();
-  }
-```
 #### Пройтись по enum
 ```typescript
 public phoneTypes = Object.values(PhoneType);
@@ -105,6 +43,7 @@ console.log(Membership[2])      // Premium - this is reversed enum
 ```ts
 protected - только в классе animal и все что наследуется
 readonly - можно определять только в конструкторе
+private - только в этом классе
 constructor(readonly model: string) { }  // та же запись что и с определением поля
 ```
 #### Guards
@@ -180,6 +119,70 @@ type UserKeysExclude = Exclude<keyof User, '_id' | 'createdAt'>  // only 'name' 
 type UserKeysInclude = Pick<User, 'name' | 'email'>              // only 'name' | 'email'
 ```
 
+## Angular
+#### Создание компоненты
+```typescript
+ng generate component modal
+ng g c modal --skipTests
+```
+
+```html
+app-root component, is the “home page” of the application,
+export - для того чтобы они были видны в других компонентах
+@Component -  это декоратор
+selector - куда вставлять компонент
+templateUrl - какой html шаблон
+
+{{}} - интерполяция вставка переменной из ts компоненты (подстановка ts|js)
+interpaltion: ['{{', '}}']
+{{ user | json }} - this is a pipe, same as JSON.stringify(user)
+<pre> </pre> - сохраняет различные пробелы (особенно json)
+bindings - связка шаблона и компонента
+когда мы передаем значение в атрибут, нужно воспользоваться концепцией binding
+[src]="imageUrl" байндим атрибут в квадратные скобки, понимает что это значение динамической переменной
+мы можем байндить любые атрибуты и передавать им динамику
+инициализация элементов в lifecycle cookie 
+добавление интерфейсов OnInit
+ngOnInit() {
+  // вызывается когда стартует компонент
+}
+```
+#### entryComponents
+the set of components to compile when this NgModule is defined, so that they can be dynamically loaded into the view
+```ts
+[] - get and set
+() - отслеживать setting
+[()]  и то и другое
+```
+
+#### Обновление таблицы
+```typescript
+@ViewChild(MatTable, {static: true}) table: MatTable<User>;
+this.table.renderRows();
+```
+
+#### Подписка на событие
+```typescript
+dialogSubscription: Subscription;
+
+if (this.dialogSubscription) {
+  console.log('unsubscribed from event');
+  this.dialogSubscription.unsubscribe();
+}
+
+this.dialogSubscription = ll.afterClosed().subscribe(x => {
+      console.dir(x);
+      // Тут можно загрузить данные
+});
+```
+
+#### При уничтожении компоненты
+```typescript
+  ngOnDestroy(): void {
+    this.dialogSubscription.unsubscribe();
+  }
+```
+
 ```ts
 $event - этот элемент нативныый
 <input type="text" (input)="inputHandler($event)">
@@ -187,7 +190,6 @@ inputHandler(event: any) {
   const value = event.target.value;
   this.title = value;
 }
-
 
 <input type="text" #myInput (input)="inputHandler(myInput.value)">
 nputHandler(value) {
