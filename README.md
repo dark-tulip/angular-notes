@@ -3,6 +3,28 @@ Preferences - tslint - disable
 
 ## TypeScript
 
+####
+```RND generators
+export function rndStr(length: number) {
+  const rndChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += rndChars[Math.floor(Math.random() * rndChars.length)];
+  }
+  return result;
+}
+
+
+export function rndInt(fromTo: number) {
+  return Math.floor(Math.random() * fromTo);
+}
+
+
+export function rndCharacter() {
+  return new Charm(rndInt(10), rndStr(5));
+}
+```
+
 #### Aliases
 ```ts
 type Login: string  // кастомный тип
