@@ -1,6 +1,9 @@
 #### Отключить линтер
 Preferences - tslint - disable
 
+### Useful links
+- https://github.com/typestack/class-validator
+- https://github.com/typestack/class-transformer
 ## TypeScript
 
 ####
